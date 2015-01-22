@@ -65,34 +65,34 @@ class FlacFile (FLAC):
     print ("thisIsPono")
 
     if 'release_guid' in self.keys():
-      release_guid = self['release_guid'][0]
+      self.release_guid = self['release_guid'][0]
     else:
-      release_guid = os.urandom(16).encode('hex')
+      self.release_guid = os.urandom(16).encode('hex')
     if not 'phc' in self.keys ():
       phc = ''
     else:
       phc = self['phc'][0]
     title = self['title'][0]
     artist = self['artist'][0]
-    print (release_guid, title, artist)
+    print (self.release_guid, title, artist)
     
-    combined = release_guid + title + artist
+    combined = self.release_guid + title + artist
     print ("combined: %s; len: %d" % (combined, len(combined)))
     m = hashlib.md5(combined.encode('utf8'))
-    key = m.hexdigest()
-    print ("key: %s; len: %d" % (key, len(key)))
-    dec = decrypt (key, phc)
+    self.key = m.hexdigest()
+    print ("key: %s; len: %d" % (self.key, len(self.key)))
+    dec = decrypt (self.key, phc)
     print ("decrypted: %s" % dec)
     if dec.startswith ('thisispono'):
-      return True, key, release_guid
+      return True
     else:
-      return False, key, release_guid
+      return False
     
-  def encrypt (self, key, release_guid):
+  def encrypt (self):
     print ("encrypt")
-    phc = encrypt (key, 'thisispono_000000000000000000000').encode("hex")
+    phc = encrypt (self.key, 'thisispono_000000000000000000000').encode("hex")
     self.setTag ('phc', phc)
-    self.setTag ('release_guid', release_guid)
+    self.setTag ('release_guid', self.release_guid)
 
   def saveFile (self):
     print ("saveFile")

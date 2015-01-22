@@ -40,7 +40,7 @@ from flacfile import FlacFile
 # 0.0.7 19.01.2015 check for empty title and artist tags
 # 0.1.0 20.01.2015 add directory traverse, add and delete pono tags
 # 0.1.1 21.01.2015 added check for sample rate for mass apply of pono tags
-# 0.1.2
+# 0.1.2 22.01.2015 added bits depth information
 
 class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
   def __init__(self, parent):
@@ -54,8 +54,9 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     rootPath = Qt.QDir.rootPath()
     self.dirModel = Qt.QFileSystemModel (self)
     self.dirModel.setRootPath (rootPath)
-    self.dirModel.setFilter (Qt.QDir.NoDotAndDotDot | Qt.QDir.AllDirs | Qt.QDir.Hidden)
-    #self.dirModel.setNameFilterDisables (False)
+    # self.dirModel.setFilter (Qt.QDir.NoDotAndDotDot | Qt.QDir.AllDirs | Qt.QDir.Hidden)
+    self.dirModel.setFilter (Qt.QDir.NoDotAndDotDot | Qt.QDir.AllDirs)
+    #s elf.dirModel.setNameFilterDisables (False)
     self.dirTreeView.setModel (self.dirModel)
     self.dirTreeView.setRootIndex(self.dirModel.index(rootPath))
     header = self.dirTreeView.header()
@@ -293,12 +294,16 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     result = QtGui.QMessageBox.warning(self, "FLAC Tagger",
                                 "phc and release_guid tags will be added to all hires flac files "
                                 "in this directory and its subdirectories.\n"
-                                "Are yoo sure?",
+                                "Are you sure?",
                                 QtGui.QMessageBox.Yes | QtGui.QMessageBox.No,
                                 QtGui.QMessageBox.No)
     if result == QtGui.QMessageBox.Yes:
+      QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
       self.counter = 0
       self.doTraverseDirSetPono (path)
+      QtGui.QApplication.restoreOverrideCursor()
+      #TODO does not work:
+      #self.displayFlacInfo ()
       QtGui.QMessageBox.information(self, "FLAC Tagger",
                                 "%d files have been modified.\n"
                                 "phc and release_guid tags have been added." % self.counter,
@@ -319,13 +324,12 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
         print ("file: %s" % sFilePath)
         try:
           audio = FlacFile (unicode (sFilePath))
-          isPono, key, release_guid = audio.thisIsPono ()
-          if isPono:
+          if audio.thisIsPono ():
             print ('is pono')
           else:
             print ('is not pono')
-            if audio.info.sample_rate > 44100:
-              audio.encrypt (key, release_guid)
+            if audio.info.sample_rate > 44100 or audio.info.bits_per_sample > 16:
+              audio.encrypt ()
               audio.saveFile ()
               self.counter += 1
         except FLACNoHeaderError:
@@ -335,12 +339,16 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     result = QtGui.QMessageBox.warning(self, "FLAC Tagger",
                                 "phc and release_guid tags will be deleted from all flac files "
                                 "in this directory and its subdirectories.\n"
-                                "Are yoo sure?",
+                                "Are you sure?",
                                 QtGui.QMessageBox.Yes | QtGui.QMessageBox.No,
                                 QtGui.QMessageBox.No)
     if result == QtGui.QMessageBox.Yes:
+      QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
       self.counter = 0
       self.doTraverseDirResetPono (path)
+      QtGui.QApplication.restoreOverrideCursor()
+      #TODO does not work:
+      # self.displayFlacInfo ()
       QtGui.QMessageBox.information(self, "FLAC Tagger",
                                 "%d files have been modified.\n"
                                 "phc and release_guid tags have been deleted." % self.counter,
@@ -361,8 +369,7 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
         print ("file: %s" % sFilePath)
         try:
           audio = FlacFile (unicode (sFilePath))
-          isPono, key, release_guid = audio.thisIsPono ()
-          if isPono:
+          if audio.thisIsPono ():
             print ('is pono')
             audio.deleteTag ('phc')
             audio.deleteTag ('release_guid')
@@ -395,8 +402,7 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
 
     self.checkTitleArtist ()
     doit = False
-    isPono, key, release_guid = self.audio.thisIsPono ()
-    if isPono:
+    if self.audio.thisIsPono ():
       ret = QtGui.QMessageBox.warning(self, "FLAC Tagger",
                                 "This file already contains valid HiRes tags.\n"
                                 "Do you want to replace it?",
@@ -408,14 +414,14 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
       doit = True
       
     if doit:
-      self.audio.encrypt (key, release_guid)
+      self.audio.encrypt ()
     if self.audio.modified:
       self.displayFlacInfo ()
 
   def setColorLabel (self):
-    isPono, key, release_guid = self.audio.thisIsPono ()
+    isPono = self.audio.thisIsPono ()
     print ("isPono: %d" % isPono)
-    if self.audio.info.sample_rate > 44100:
+    if self.audio.info.sample_rate > 44100 or self.audio.info.bits_per_sample > 16:
       if isPono:
         self.colorLabel.setPixmap (self.bluePixmap)
       else:
@@ -439,7 +445,7 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     self.tagListView.horizontalHeader ().restoreState (state)
       
     self.sampleRateLabel.setText ("Sample rate: %d Hz" % self.audio.info.sample_rate)
-    self.bitDepthLabel.setText ("Bits per sample: %d Hz" % self.audio.info.bits_per_sample)
+    self.bitDepthLabel.setText ("Bits per sample: %d" % self.audio.info.bits_per_sample)
     self.lengthLabel.setText ("Length: %d:%02d" % (self.audio.info.length/60,  self.audio.info.length%60))
     self.channelsLabel.setText ("Channels: %d" % self.audio.info.channels)
     for key in self.audio:
