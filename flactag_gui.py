@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'flactag_gui.ui'
 #
-# Created: Mon Jan 19 22:17:01 2015
+# Created: Thu Jan 22 11:03:37 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -52,6 +52,9 @@ class Ui_MainWindow(object):
         self.sampleRateLabel = QtGui.QLabel(self.groupBox)
         self.sampleRateLabel.setObjectName(_fromUtf8("sampleRateLabel"))
         self.verticalLayout.addWidget(self.sampleRateLabel)
+        self.bitDepthLabel = QtGui.QLabel(self.groupBox)
+        self.bitDepthLabel.setObjectName(_fromUtf8("bitDepthLabel"))
+        self.verticalLayout.addWidget(self.bitDepthLabel)
         self.lengthLabel = QtGui.QLabel(self.groupBox)
         self.lengthLabel.setObjectName(_fromUtf8("lengthLabel"))
         self.verticalLayout.addWidget(self.lengthLabel)
@@ -123,6 +126,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "FLAC Tagger", None))
         self.groupBox.setTitle(_translate("MainWindow", "FLAC File", None))
         self.sampleRateLabel.setText(_translate("MainWindow", "Sample rate", None))
+        self.bitDepthLabel.setText(_translate("MainWindow", "Bits per sample", None))
         self.lengthLabel.setText(_translate("MainWindow", "Length", None))
         self.channelsLabel.setText(_translate("MainWindow", "Channels", None))
         self.buttonAdd.setToolTip(_translate("MainWindow", "Add new empty tag", None))

@@ -54,9 +54,10 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     rootPath = Qt.QDir.rootPath()
     self.dirModel = Qt.QFileSystemModel (self)
     self.dirModel.setRootPath (rootPath)
-    self.dirModel.setFilter (Qt.QDir.NoDotAndDotDot | Qt.QDir.AllDirs)
+    self.dirModel.setFilter (Qt.QDir.NoDotAndDotDot | Qt.QDir.AllDirs | Qt.QDir.Hidden)
+    #self.dirModel.setNameFilterDisables (False)
     self.dirTreeView.setModel (self.dirModel)
-    # self.dirTreeView.setRootIndex(self.dirModel.index(rootPath))
+    self.dirTreeView.setRootIndex(self.dirModel.index(rootPath))
     header = self.dirTreeView.header()
     header.hideSection(1)
     header.hideSection(2)
@@ -438,6 +439,7 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     self.tagListView.horizontalHeader ().restoreState (state)
       
     self.sampleRateLabel.setText ("Sample rate: %d Hz" % self.audio.info.sample_rate)
+    self.bitDepthLabel.setText ("Bits per sample: %d Hz" % self.audio.info.bits_per_sample)
     self.lengthLabel.setText ("Length: %d:%02d" % (self.audio.info.length/60,  self.audio.info.length%60))
     self.channelsLabel.setText ("Channels: %d" % self.audio.info.channels)
     for key in self.audio:

@@ -45,6 +45,13 @@
           </widget>
          </item>
          <item>
+          <widget class="QLabel" name="bitDepthLabel">
+           <property name="text">
+            <string>Bits per sample</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="lengthLabel">
            <property name="text">
             <string>Length</string>
