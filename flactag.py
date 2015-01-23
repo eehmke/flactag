@@ -42,14 +42,93 @@ from flacfile import FlacFile
 # 0.1.1 21.01.2015 added check for sample rate for mass apply of pono tags
 # 0.1.2 22.01.2015 added bits depth information
 
+version = "V0.1.2"
+ 
+class Traverser:
+  def __init__(self):
+    self.counter = 0
+    
+  def traverseDir (self, path):
+    print ("traversDir: %s" % path)
+    dir = Qt.QDir (path)
+    list = dir.entryInfoList()
+    for iList in range (len(list)):
+      info = list[iList]
+      sFilePath = info.filePath()
+      if info.isDir():
+        # recursive
+        if info.fileName() != ".." and info.fileName() != ".":
+          self.traverseDir (sFilePath)
+      else:
+        print ("file: %s" % sFilePath)
+        try:
+          audio = FlacFile (unicode (sFilePath))
+          if audio.thisIsPono ():
+            print ('is pono')
+            self.counter += 1
+          else:
+            print ('is not pono')
+        except FLACNoHeaderError:
+          print ('is no flac file')
+
+  def traverseDirSetPono (self, path):
+    print ("traverseDirSetPono: %s" % path)
+    dir = Qt.QDir (path)
+    list = dir.entryInfoList()
+    for iList in range (len(list)):
+      info = list[iList]
+      sFilePath = info.filePath()
+      if info.isDir():
+        # recursive
+        if info.fileName() != ".." and info.fileName() != ".":
+          self.traverseDirSetPono (sFilePath)
+      else:
+        print ("file: %s" % sFilePath)
+        try:
+          audio = FlacFile (unicode (sFilePath))
+          if audio.thisIsPono ():
+            print ('is pono')
+          else:
+            print ('is not pono')
+            if audio.info.sample_rate > 44100 or audio.info.bits_per_sample > 16:
+              audio.encrypt ()
+              audio.saveFile ()
+              self.counter += 1
+        except FLACNoHeaderError:
+          print ('is no flac file')
+
+  def traverseDirResetPono (self, path):
+    print ("traverseDirSetPono: %s" % path)
+    dir = Qt.QDir (path)
+    list = dir.entryInfoList()
+    for iList in range (len(list)):
+      info = list[iList]
+      sFilePath = info.filePath()
+      if info.isDir():
+        # recursive
+        if info.fileName() != ".." and info.fileName() != ".":
+          self.traverseDirResetPono (sFilePath)
+      else:
+        print ("file: %s" % sFilePath)
+        try:
+          audio = FlacFile (unicode (sFilePath))
+          if audio.thisIsPono ():
+            print ('is pono')
+            audio.deleteTag ('phc')
+            audio.deleteTag ('release_guid')
+            audio.saveFile ()
+            self.counter += 1
+          else:
+            print ('is not pono')
+        except FLACNoHeaderError:
+          print ('is no flac file')
+ 
 class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
   def __init__(self, parent):
     global args
     super(FlacTagWindow, self).__init__()
     self.setupUi(self)
-    
-    self.version = "V0.1.2"
-    
+        
     homePath = Qt.QDir.homePath()
     rootPath = Qt.QDir.rootPath()
     self.dirModel = Qt.QFileSystemModel (self)
@@ -299,41 +378,16 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
                                 QtGui.QMessageBox.No)
     if result == QtGui.QMessageBox.Yes:
       QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-      self.counter = 0
-      self.doTraverseDirSetPono (path)
+      traverser = Traverser ()
+      traverser.traverseDirSetPono (path)
       QtGui.QApplication.restoreOverrideCursor()
       #TODO does not work:
       #self.displayFlacInfo ()
       QtGui.QMessageBox.information(self, "FLAC Tagger",
                                 "%d files have been modified.\n"
-                                "phc and release_guid tags have been added." % self.counter,
+                                "phc and release_guid tags have been added." % traverser.counter,
                                 QtGui.QMessageBox.Ok)
     
-  def doTraverseDirSetPono (self, path):
-    print ("traverseDirSetPono: %s" % path)
-    dir = Qt.QDir (path)
-    list = dir.entryInfoList()
-    for iList in range (len(list)):
-      info = list[iList]
-      sFilePath = info.filePath()
-      if info.isDir():
-        # recursive
-        if info.fileName() != ".." and info.fileName() != ".":
-          self.doTraverseDirSetPono (sFilePath)
-      else:
-        print ("file: %s" % sFilePath)
-        try:
-          audio = FlacFile (unicode (sFilePath))
-          if audio.thisIsPono ():
-            print ('is pono')
-          else:
-            print ('is not pono')
-            if audio.info.sample_rate > 44100 or audio.info.bits_per_sample > 16:
-              audio.encrypt ()
-              audio.saveFile ()
-              self.counter += 1
-        except FLACNoHeaderError:
-          print ('is no flac file')
           
   def traverseDirResetPono (self, path):
     result = QtGui.QMessageBox.warning(self, "FLAC Tagger",
@@ -344,42 +398,16 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
                                 QtGui.QMessageBox.No)
     if result == QtGui.QMessageBox.Yes:
       QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-      self.counter = 0
-      self.doTraverseDirResetPono (path)
+      traverser = Traverser ()
+      traverser.traverseDirResetPono (path)
       QtGui.QApplication.restoreOverrideCursor()
       #TODO does not work:
       # self.displayFlacInfo ()
       QtGui.QMessageBox.information(self, "FLAC Tagger",
                                 "%d files have been modified.\n"
-                                "phc and release_guid tags have been deleted." % self.counter,
+                                "phc and release_guid tags have been deleted." % traverser.counter,
                                 QtGui.QMessageBox.Ok)
 
-  def doTraverseDirResetPono (self, path):
-    print ("traverseDirSetPono: %s" % path)
-    dir = Qt.QDir (path)
-    list = dir.entryInfoList()
-    for iList in range (len(list)):
-      info = list[iList]
-      sFilePath = info.filePath()
-      if info.isDir():
-        # recursive
-        if info.fileName() != ".." and info.fileName() != ".":
-          self.doTraverseDirResetPono (sFilePath)
-      else:
-        print ("file: %s" % sFilePath)
-        try:
-          audio = FlacFile (unicode (sFilePath))
-          if audio.thisIsPono ():
-            print ('is pono')
-            audio.deleteTag ('phc')
-            audio.deleteTag ('release_guid')
-            audio.saveFile ()
-            self.counter += 1
-          else:
-            print ('is not pono')
-        except FLACNoHeaderError:
-          print ('is no flac file')
-      
   def checkTitleArtist (self):
     print ("checkTitleArtist")
     
@@ -460,34 +488,57 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     dialog.show()
 
   def showAbout (self):
-    dialog = about.AboutDialog (self, self.version)
+    dialog = about.AboutDialog (self, version)
     dialog.show()
   
-# Hauptprogramm
-# Starte die Applikation und zeige das Hauptfenster
+# main program
 def main():
   global args
   
-  #print ("Version: %s" % Qt.QT_VERSION_STR)
-  #print ("File: %s" % args.file)
-    
-  app = QtGui.QApplication(sys.argv)
+  if args.batch:
+    #start in batch mode, no gui
+    print ('flactag version %s' % version)
+    print ("Qt Version: %s" % Qt.QT_VERSION_STR)
+    print ("PyQt Version: %s" % QtCore.PYQT_VERSION_STR)
+    print ("Directory: %s" % args.directory)
+    if not args.set and not args.reset:
+      print ("show directory")
+      traverser = Traverser ()
+      traverser.traverseDir (args.directory)
+      print ("%d hires files have been found" % traverser.counter)
+    elif args.set:
+      print ("set")
+      traverser = Traverser ()
+      traverser.traverseDirSetPono (args.directory)
+      print ("%d files have been modified" % traverser.counter)
+    else:
+      print ("reset")
+      traverser = Traverser ()
+      traverser.traverseDirResetPono (args.directory)
+      print ("%d files have been modified" % traverser.counter)
 
-  w = FlacTagWindow(None)
-  # app.setStyle (QtGui.QStyleFactory.create("plastique"))
+  else:  
+    # start qt gui
+    app = QtGui.QApplication(sys.argv)
+
+    w = FlacTagWindow(None)
   
-  w.show()
-
-  sys.exit(app.exec_())
+    w.show()
+    sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
   global args
   parser = argparse.ArgumentParser()
-  parser.add_argument('-v', dest='verbose', action='store_true')
-  parser.add_argument('-p', dest='profile', action='store_true')
-  parser.add_argument('-f', dest='file', action='store')
+  parser.add_argument('-b', '--batch',     dest='batch',     action='store_true', help = 'batch mode')
+  parser.add_argument('-v', '--verbose',   dest='verbose',   action='store_true', help = 'verbose')
+  parser.add_argument('-f', '--file',      dest='file',      action='store',      help = 'flac file')
+  parser.add_argument('-d', '--directory', dest='directory', action='store',      help = 'directory')
+  parser.add_argument('-s', '--set',       dest='set',       action='store_true', help = 'set hires tags')
+  parser.add_argument('-r', '--reset',     dest='reset',     action='store_true', help = 'reset hires tags')
   args = parser.parse_args()
-  # print (args)
+  if args.batch:
+    if not args.directory:
+      parser.error ('In batch mode directory must be provided')
   
   main()
