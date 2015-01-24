@@ -23,6 +23,7 @@ from PyQt4 import Qt
 from mutagen.flac import FLAC, FLACNoHeaderError
 from Crypto.Cipher import AES
 import hashlib
+from logger import Logger
 
 def decrypt (key, data):
   """
@@ -43,10 +44,11 @@ def encrypt (key, data):
 
 class FlacFile (FLAC):
   
-  def __init__(self, name):
+  def __init__(self, name, logger):
     try:
       super(FlacFile,self).__init__(name)
       self.modified = False
+      self.logger = logger
     except FLACNoHeaderError:
       raise
     
@@ -62,7 +64,7 @@ class FlacFile (FLAC):
     self.modified = True
     
   def thisIsPono (self):
-    print ("thisIsPono")
+    self.logger ("thisIsPono")
 
     if 'release_guid' in self.keys():
       self.release_guid = self['release_guid'][0]
@@ -74,28 +76,27 @@ class FlacFile (FLAC):
       phc = self['phc'][0]
     title = self['title'][0]
     artist = self['artist'][0]
-    print (self.release_guid, title, artist)
     
     combined = self.release_guid + title + artist
-    print ("combined: %s; len: %d" % (combined, len(combined)))
+    self.logger ("combined: %s; len: %d" % (combined, len(combined)))
     m = hashlib.md5(combined.encode('utf8'))
     self.key = m.hexdigest()
-    print ("key: %s; len: %d" % (self.key, len(self.key)))
+    self.logger ("key: %s; len: %d" % (self.key, len(self.key)))
     dec = decrypt (self.key, phc)
-    print ("decrypted: %s" % dec)
+    self.logger ("decrypted: %s" % dec)
     if dec.startswith ('thisispono'):
       return True
     else:
       return False
     
   def encrypt (self):
-    print ("encrypt")
+    self.logger ("encrypt")
     phc = encrypt (self.key, 'thisispono_000000000000000000000').encode("hex")
     self.setTag ('phc', phc)
     self.setTag ('release_guid', self.release_guid)
 
   def saveFile (self):
-    print ("saveFile")
+    self.logger ("saveFile")
     self.modified = False
     self.save ()
     
