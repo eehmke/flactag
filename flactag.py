@@ -44,8 +44,9 @@ from logger import Logger
 # 0.1.2 22.01.2015 added bits depth information
 # 0.1.3 23.01.2015 added batch run options for command line operation
 # 0.1.4 24.01.2015 bugfix, path of help file when called from other directory
+# 0.1.5 24.01.2015 improved directory display
 
-version = "V0.1.4"
+version = "V0.1.5-pre"
  
 class Traverser:
   def __init__(self, logger):
@@ -136,13 +137,17 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
         
     homePath = Qt.QDir.homePath()
     rootPath = Qt.QDir.rootPath()
+
     self.dirModel = Qt.QFileSystemModel (self)
-    self.dirModel.setRootPath (rootPath)
     # self.dirModel.setFilter (Qt.QDir.NoDotAndDotDot | Qt.QDir.AllDirs | Qt.QDir.Hidden)
     self.dirModel.setFilter (Qt.QDir.NoDotAndDotDot | Qt.QDir.AllDirs)
-    #s elf.dirModel.setNameFilterDisables (False)
+    # self.dirModel.setFilter (Qt.QDir.NoDot | Qt.QDir.AllDirs)
+    # self.dirModel.setNameFilterDisables (False)
+
+    self.dirModel.setRootPath (rootPath)
     self.dirTreeView.setModel (self.dirModel)
-    self.dirTreeView.setRootIndex(self.dirModel.index(rootPath))
+    # self.dirTreeView.setRootIndex(self.dirModel.index(rootPath))
+    
     header = self.dirTreeView.header()
     header.hideSection(1)
     header.hideSection(2)
@@ -153,7 +158,8 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     
     self.fileModel = Qt.QFileSystemModel (self)
     self.fileModel.setRootPath (homePath)
-    self.fileModel.setFilter (Qt.QDir.NoDotAndDotDot | Qt.QDir.Files)
+    # self.fileModel.setFilter (Qt.QDir.NoDotAndDotDot | Qt.QDir.Files)
+    self.fileModel.setFilter (Qt.QDir.NoDotAndDotDot | Qt.QDir.Files | Qt.QDir.AllDirs)
     self.fileListView.setModel (self.fileModel)
     
     selmodel = self.dirTreeView.selectionModel()
@@ -293,11 +299,15 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
         index = indexes[0]
         self.fileInfo = self.fileModel.fileInfo (index)
         fullName = self.fileInfo.filePath ()
-        try:
-          self.audio = FlacFile (unicode (fullName), self.logger)
-          self.displayFlacInfo ()
-        except FLACNoHeaderError:
-          pass
+        if self.fileInfo.isFile ():
+          try:
+            self.audio = FlacFile (unicode (fullName), self.logger)
+            self.displayFlacInfo ()
+          except FLACNoHeaderError:
+            pass
+        else:
+          self.logger (unicode (self.fileInfo.filePath ()))
+          self.fileListView.setRootIndex(self.fileModel.setRootPath(self.fileInfo.filePath ()))
       
   def handleItemChanged (self, item):
     self.logger ("handleItemChanged")
