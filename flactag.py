@@ -254,7 +254,7 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
       if fileName:
         fileName = unicode (fileName)
         self.fileInfo = Qt.QFileInfo (fileName)
-        self.audio = FlacFile(fileName.self.logger)
+        self.audio = FlacFile(fileName, self.logger)
         self.displayFlacInfo ()
  
   def saveFile (self):
