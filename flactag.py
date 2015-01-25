@@ -43,8 +43,9 @@ from logger import Logger
 # 0.1.1 21.01.2015 added check for sample rate for mass apply of pono tags
 # 0.1.2 22.01.2015 added bits depth information
 # 0.1.3 23.01.2015 added batch run options for command line operation
+# 0.1.4 24.01.2015 bugfix, path of help file when called from other directory
 
-version = "V0.1.3"
+version = "V0.1.4"
  
 class Traverser:
   def __init__(self, logger):
@@ -481,14 +482,14 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     self.lengthLabel.setText ("Length: %d:%02d" % (self.audio.info.length/60,  self.audio.info.length%60))
     self.channelsLabel.setText ("Channels: %d" % self.audio.info.channels)
     for key in self.audio:
-      self.logger ("tag: %s; value: %s" % (key, audio[key]))
+      self.logger ("tag: %s; value: %s" % (key, self.audio[key]))
       tag = QtGui.QStandardItem (Qt.QString (key.encode()))
       value = QtGui.QStandardItem (Qt.QString (self.audio[key][0]))
       self.tableModel.appendRow ([tag, value])
     self.setColorLabel ()
 
   def showHelp (self):
-    dialog = help.HelpDialog (self)
+    dialog = help.HelpDialog (self, self.logger)
     dialog.show()
 
   def showAbout (self):

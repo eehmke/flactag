@@ -18,19 +18,25 @@
 
 from help_gui import *
 from PyQt4 import Qt
+from inspect import getsourcefile
+import os
+from os.path import abspath
 
 # Zeige den Hilfetext. Dies ist eine HTML-Datei, die von OpenOffice exportiert wurde
 # Sie kann aktive Links enthalten, darum verwenden wir die QWebView Klasse als Browser
 class HelpDialog (Qt.QDialog, Ui_Dialog):
-    def __init__(self, parent):
+    def __init__(self, parent, logger):
         Qt.QDialog.__init__(self,parent)
         self.setupUi(self)
+        self.logger = logger
 
         #self.webView.loadFinished.connect(self.slotLoadFinished)
         #self.webView.loadStarted.connect(self.slotLoadStarted)
         
-        #print "loading file..."
-        url = Qt.QUrl.fromLocalFile(Qt.QDir.current().absolutePath() + '/help.html')
+        self.logger ("loading file...")
+        dir = Qt.QDir (os.path.dirname(abspath(getsourcefile(lambda _: None))))
+        self.logger (dir.absolutePath ())
+        url = Qt.QUrl.fromLocalFile(dir.absolutePath() + '/help.html')
         self.webView.load (url)
         self.webView.show()
 
