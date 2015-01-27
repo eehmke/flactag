@@ -14,118 +14,181 @@
    <string>FLAC Tagger</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="QTreeView" name="dirTreeView"/>
       <widget class="QListView" name="fileListView"/>
-      <widget class="QSplitter" name="splitter_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="locale">
+        <locale language="English" country="UnitedStates"/>
        </property>
-       <widget class="QGroupBox" name="groupBox">
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="title">
-         <string>FLAC File</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QLineEdit" name="fileNameEdit"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="sampleRateLabel">
-           <property name="text">
-            <string>Sample rate</string>
-           </property>
+       <property name="title">
+        <string>FLAC File</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLineEdit" name="fileNameEdit"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="sampleRateLabel">
+            <property name="text">
+             <string>Sample rate</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="bitDepthLabel">
+            <property name="text">
+             <string>Bits per sample</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lengthLabel">
+            <property name="text">
+             <string>Length</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="channelsLabel">
+              <property name="text">
+               <string>Channels</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="colorLabel">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QTabWidget" name="tabWidget">
+          <property name="locale">
+           <locale language="English" country="UnitedStates"/>
+          </property>
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="tab">
+           <attribute name="title">
+            <string>Tags</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="0" column="0">
+               <widget class="QPushButton" name="buttonAdd">
+                <property name="toolTip">
+                 <string>Add new empty tag</string>
+                </property>
+                <property name="text">
+                 <string>Add Tag</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" colspan="2">
+               <widget class="QPushButton" name="buttonAddHires">
+                <property name="toolTip">
+                 <string>calculate phc tag based on artist and title, add relevant tags</string>
+                </property>
+                <property name="text">
+                 <string>add HiRes Tags</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="2">
+               <widget class="QPushButton" name="buttonDelete">
+                <property name="toolTip">
+                 <string>delete selected tag</string>
+                </property>
+                <property name="text">
+                 <string>Delete Tag</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <spacer name="horizontalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>212</width>
+                  <height>18</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTableView" name="tagListView"/>
+            </item>
+           </layout>
           </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="bitDepthLabel">
-           <property name="text">
-            <string>Bits per sample</string>
-           </property>
+          <widget class="QWidget" name="tab_2">
+           <attribute name="title">
+            <string>Pictures</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0">
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                 <widget class="QPushButton" name="buttonAddPicture">
+                  <property name="text">
+                   <string>Add Picture</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="buttonDeletePicture">
+                  <property name="text">
+                   <string>Delete Picture</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QLabel" name="labelPicture">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="scaledContents">
+                 <bool>false</bool>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="lengthLabel">
-           <property name="text">
-            <string>Length</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <widget class="QLabel" name="channelsLabel">
-             <property name="text">
-              <string>Channels</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="colorLabel">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QPushButton" name="buttonAdd">
-             <property name="toolTip">
-              <string>Add new empty tag</string>
-             </property>
-             <property name="text">
-              <string>Add Tag</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1" colspan="2">
-            <widget class="QPushButton" name="buttonAddHires">
-             <property name="toolTip">
-              <string>calculate phc tag based on artist and title, add relevant tags</string>
-             </property>
-             <property name="text">
-              <string>add HiRes Tags</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0" colspan="2">
-            <widget class="QPushButton" name="buttonDelete">
-             <property name="toolTip">
-              <string>delete selected tag</string>
-             </property>
-             <property name="text">
-              <string>Delete Tag</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QTableView" name="tagListView"/>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>

@@ -44,9 +44,9 @@ from logger import Logger
 # 0.1.2 22.01.2015 added bits depth information
 # 0.1.3 23.01.2015 added batch run options for command line operation
 # 0.1.4 24.01.2015 bugfix, path of help file when called from other directory
-# 0.1.5 24.01.2015 improved directory display
+# 0.1.5 24.01.2015 improved directory display, added cover art display
 
-version = "V0.1.5-pre"
+version = "V0.1.5"
  
 class Traverser:
   def __init__(self, logger):
@@ -197,12 +197,21 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     self.redPixmap = QtGui.QPixmap(20,20)
     self.redPixmap.fill(QtGui.QColor("red"))
 
+    # install event filter to allow resize of picture
+    self.labelPicture.installEventFilter(self)
+    self.coverArtPixmap = None
+    
+    self.buttonAddPicture.setEnabled (False)
+    self.buttonDeletePicture.setEnabled (False)
+    # avtivate first tab with tag settings
+    self.tabWidget.setCurrentIndex(0)
+
     setting = Qt.QSettings ("flactag", "flactag")
     setting.beginGroup ('main_window')
     self.restoreGeometry (setting.value("geometry").toByteArray())
     self.centralwidget.restoreGeometry (setting.value("centralwidget").toByteArray())
     self.splitter.restoreState (setting.value("splitter").toByteArray())
-    self.splitter_2.restoreState (setting.value("splitter_2").toByteArray())
+    # self.splitter_2.restoreState (setting.value("splitter_2").toByteArray())
     self.restoreState(setting.value("windowState").toByteArray());
     self.tagListView.horizontalHeader ().restoreState (setting.value("tagListView").toByteArray())
     setting.endGroup ()
@@ -274,7 +283,7 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     setting.setValue("geometry", self.saveGeometry())
     setting.setValue("centralwidget", self.centralwidget.saveGeometry())
     setting.setValue("splitter", self.splitter.saveState())
-    setting.setValue("splitter_2", self.splitter_2.saveState())
+    # setting.setValue("splitter_2", self.splitter_2.saveState())
     setting.setValue("windowState", self.saveState())
     setting.setValue("tagListView", self.tagListView.horizontalHeader ().saveState())
     setting.endGroup ()
@@ -304,10 +313,15 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
             self.audio = FlacFile (unicode (fullName), self.logger)
             self.displayFlacInfo ()
           except FLACNoHeaderError:
+            self.logger ("FLACNoHeaderError")
             pass
         else:
           self.logger (unicode (self.fileInfo.filePath ()))
           self.fileListView.setRootIndex(self.fileModel.setRootPath(self.fileInfo.filePath ()))
+      else:
+        self.logger ("not modified")
+    else:
+      self.logger ("no indexes")
       
   def handleItemChanged (self, item):
     self.logger ("handleItemChanged")
@@ -479,6 +493,8 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     name = self.fileInfo.fileName ()
     self.logger ("name: %s" % name)
     self.fileNameEdit.setText (name)
+    # avtivate first tab with tag settings
+    self.tabWidget.setCurrentIndex(0)
       
     # save the state to be restored after resetting the header
     state = self.tagListView.horizontalHeader ().saveState ()
@@ -497,7 +513,42 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
       value = QtGui.QStandardItem (Qt.QString (self.audio[key][0]))
       self.tableModel.appendRow ([tag, value])
     self.setColorLabel ()
+    
+    #display pictures
+    pics = self.audio.pictures
+    if len(pics) > 0:
+      self.logger ("%d pictures found" % len (pics))
+      pic = pics [0]
+      image = QtGui.QImage ()
+      if pic.mime == 'image/jpeg':
+        print ('jpg')
+        image.loadFromData (pic.data, 'JPG')
+        self.coverArtPixmap = QtGui.QPixmap.fromImage(image)
+        self.labelPicture.setPixmap(self.coverArtPixmap.scaled(
+            self.labelPicture.width(), self.labelPicture.height(),
+            QtCore.Qt.KeepAspectRatio))
+      elif pic.mime == 'image/png':
+        print ('png')
+        image.loadFromData (pic.data, 'PNG')
+        self.coverArtPixmap = QtGui.QPixmap.fromImage(image)
+        self.labelPicture.setPixmap(self.coverArtPixmap.scaled(
+            self.labelPicture.width(), self.labelPicture.height(),
+            QtCore.Qt.KeepAspectRatio))
+      else:
+        self.labelPicture.setText ("unknown mime type: %s\n"
+                                    "cannot display picture" % pic.mime)
 
+  def eventFilter(self, widget, event):
+    # print ("eventFilter")
+    if (event.type() == QtCore.QEvent.Resize and
+        widget is self.labelPicture):
+      if self.coverArtPixmap:        
+        self.labelPicture.setPixmap(self.coverArtPixmap.scaled(
+            self.labelPicture.width(), self.labelPicture.height(),
+            QtCore.Qt.KeepAspectRatio))
+        return True
+    return QtGui.QMainWindow.eventFilter(self, widget, event)
+      
   def showHelp (self):
     dialog = help.HelpDialog (self, self.logger)
     dialog.show()
