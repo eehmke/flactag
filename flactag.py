@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # flactag.py
-# This program aims to support tagging of FLAC files
+# This program aims to support tagging of FLAC files   
+# and supports the wonderful Pono player.
 # Copyright (C) 2015  Eggert Ehmke <eggert@eehmke.de>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -44,7 +45,7 @@ from logger import Logger
 # 0.1.2 22.01.2015 added bits depth information
 # 0.1.3 23.01.2015 added batch run options for command line operation
 # 0.1.4 24.01.2015 bugfix, path of help file when called from other directory
-# 0.1.5 24.01.2015 improved directory display, added cover art display
+# 0.1.5 28.01.2015 improved directory display, added cover art display
 
 version = "V0.1.5"
  
