@@ -1,0 +1,47 @@
+flactag.py
+This program aims to support tagging of FLAC files
+and supports the wonderful Pono player.  
+Copyright (C) 2015  Eggert Ehmke <eggert@eehmke.de>
+
+Source files and semi stable packages are available at
+
+https://github.com/eehmke/flactag/
+
+Installation instructions: these may be incomplete, as I don't have all kind
+of systems available. If you find any missing steps, please let me know.
+
+1. Linux
+
+I assume a Debian derived distribution, like Ubuntu or Mint. The package
+names and installation methods may vary for other distributions.
+
+Dependencies: these packages must be installed to be able to rum flagtag:
+python2.7
+python3-pyqt4
+python-mutagen
+python-pycryptopp
+
+run the program flactag.py
+
+2. Mac / OS-X
+
+Use MacPorts to install the needed packages.
+
+port install python27 
+port install py27-crypto 
+port install py27-flac 
+port install py27-mutagen
+
+extract the content of the source code archive into a local directory.
+
+Run the program by
+python.27 flactag.py 
+
+3. Windows
+
+The distributed binary packages are build for a 64bit system. For a 32bit system,
+you may have to use the source package.
+
+Extract the flactag-win<version>.zip into a local directory. The dist
+subdirectory may be moved or copied to a location as needed. Run the program
+flactag.exe.
