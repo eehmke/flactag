@@ -11,6 +11,6 @@ options = {
   }
 }
 )
-
-setup(console=['flactag.py'])
-
+DATA=[('imageformats',['C:\\Python27/Lib/site-packages/PyQt4/plugins/imageformats/qjpeg4.dll'])]
+setup(console=['flactag.py'],
+  data_files = DATA)

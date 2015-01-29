@@ -46,8 +46,9 @@ from logger import Logger
 # 0.1.3 23.01.2015 added batch run options for command line operation
 # 0.1.4 24.01.2015 bugfix, path of help file when called from other directory
 # 0.1.5 28.01.2015 improved directory display, added cover art display
+# 0.1.6 29.01.2015 corrected jpg problem in windows
 
-version = "V0.1.5"
+version = "V0.1.6"
  
 class Traverser:
   def __init__(self, logger):
@@ -522,14 +523,15 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
       pic = pics [0]
       image = QtGui.QImage ()
       if pic.mime == 'image/jpeg':
-        print ('jpg')
+        self.logger ('mimetype = image/jpg')
         image.loadFromData (pic.data, 'JPG')
         self.coverArtPixmap = QtGui.QPixmap.fromImage(image)
+        self.logger ('width = %d, height = %d' % (self.coverArtPixmap.width(), self.coverArtPixmap.height()))
         self.labelPicture.setPixmap(self.coverArtPixmap.scaled(
             self.labelPicture.width(), self.labelPicture.height(),
             QtCore.Qt.KeepAspectRatio))
       elif pic.mime == 'image/png':
-        print ('png')
+        self.logger ('mimetype = image/png')
         image.loadFromData (pic.data, 'PNG')
         self.coverArtPixmap = QtGui.QPixmap.fromImage(image)
         self.labelPicture.setPixmap(self.coverArtPixmap.scaled(
@@ -538,6 +540,11 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
       else:
         self.labelPicture.setText ("unknown mime type: %s\n"
                                     "cannot display picture" % pic.mime)
+    else:
+      self.logger ('no pictures in file')
+      self.labelPicture.setText ("There are no pictures in this file.\n"
+                                 "Cannot display picture")
+
 
   def eventFilter(self, widget, event):
     # print ("eventFilter")

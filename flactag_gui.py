@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'flactag_gui.ui'
 #
-# Created: Tue Jan 27 23:43:36 2015
+# Created: Thu Jan 29 19:25:16 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -114,8 +114,13 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.labelPicture.sizePolicy().hasHeightForWidth())
         self.labelPicture.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelPicture.setFont(font)
         self.labelPicture.setScaledContents(False)
-        self.labelPicture.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.labelPicture.setAlignment(QtCore.Qt.AlignCenter)
         self.labelPicture.setObjectName(_fromUtf8("labelPicture"))
         self.verticalLayout_3.addWidget(self.labelPicture)
         self.gridLayout_3.addLayout(self.verticalLayout_3, 0, 0, 1, 1)
