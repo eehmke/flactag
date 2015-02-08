@@ -89,6 +89,11 @@ class FlacFile (FLAC):
     else:
       return False
     
+  def addPicture (self,pic):
+    self.logger ("addPicture")
+    self.add_picture (pic)
+    self.modified = True
+    
   def encrypt (self):
     self.logger ("encrypt")
     phc = encrypt (self.key, 'thisispono_000000000000000000000').encode("hex")

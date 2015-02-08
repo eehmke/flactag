@@ -26,7 +26,8 @@ from PyQt4 import Qt
 from PyQt4 import QtNetwork
 import sip
 from PyQt4.QtGui import *
-from mutagen.flac import FLAC, FLACNoHeaderError
+from mutagen.flac import FLAC, FLACNoHeaderError, Picture
+# from quodlibet.formats._image import APICType
 import base64
 import help, about, flacfile
 from flacfile import FlacFile
@@ -46,7 +47,7 @@ from logger import Logger
 # 0.1.3 23.01.2015 added batch run options for command line operation
 # 0.1.4 24.01.2015 bugfix, path of help file when called from other directory
 # 0.1.5 28.01.2015 improved directory display, added cover art display
-# 0.1.6 29.01.2015 corrected jpg problem in windows
+# 0.1.6 08.02.2015 corrected jpg problem in windows, added cover art setting
 
 version = "V0.1.6"
  
@@ -203,8 +204,9 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
     self.labelPicture.installEventFilter(self)
     self.coverArtPixmap = None
     
-    self.buttonAddPicture.setEnabled (False)
+    self.buttonAddPicture.setEnabled (True)
     self.buttonDeletePicture.setEnabled (False)
+    self.buttonAddPicture.clicked.connect (self.buttonAddPictureClicked)
     # avtivate first tab with tag settings
     self.tabWidget.setCurrentIndex(0)
 
@@ -515,14 +517,19 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
       value = QtGui.QStandardItem (Qt.QString (self.audio[key][0]))
       self.tableModel.appendRow ([tag, value])
     self.setColorLabel ()
-    
-    #display pictures
+    self.displayPictures ()
+ 
+  def displayPictures (self):
+    self.logger ("displayPictures")
     pics = self.audio.pictures
     if len(pics) > 0:
       self.logger ("%d pictures found" % len (pics))
       pic = pics [0]
       image = QtGui.QImage ()
-      if pic.mime == 'image/jpeg':
+      self.logger ("type: %s" % pic.type)
+      self.logger ("colors: %d" % pic.colors)
+      self.logger ("len: %d" % len (pic.data))
+      if pic.mime == 'image/jpg' or pic.mime == 'image/jpeg':
         self.logger ('mimetype = image/jpg')
         image.loadFromData (pic.data, 'JPG')
         self.coverArtPixmap = QtGui.QPixmap.fromImage(image)
@@ -547,7 +554,7 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
 
 
   def eventFilter(self, widget, event):
-    # print ("eventFilter")
+    self.logger ("eventFilter")
     if (event.type() == QtCore.QEvent.Resize and
         widget is self.labelPicture):
       if self.coverArtPixmap:        
@@ -556,7 +563,52 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
             QtCore.Qt.KeepAspectRatio))
         return True
     return QtGui.QMainWindow.eventFilter(self, widget, event)
-      
+   
+  def buttonAddPictureClicked (self):
+    self.logger ("buttonAddPictureClicked")
+    filename = QtGui.QFileDialog.getOpenFileName (self, "Image File")
+    reader = QtGui.QImageReader (filename)
+    rformat = reader.format()
+    image = reader.read ()
+    self.coverArtPixmap = QtGui.QPixmap.fromImage(image)
+    self.logger ('width = %d, height = %d' % (self.coverArtPixmap.width(), self.coverArtPixmap.height()))
+    self.labelPicture.setPixmap(self.coverArtPixmap.scaled(
+      self.labelPicture.width(), self.labelPicture.height(), QtCore.Qt.KeepAspectRatio))
+    
+    pic = Picture ()
+    
+    data = Qt.QByteArray()
+    buf = Qt.QBuffer(data)
+    
+    pic.type = 3 # APICType.COVER_FRONT
+    self.logger ('format: %s' % rformat)
+    if rformat == 'png':
+      pic.mime = 'image/png'
+      image.save(buf, 'PNG')
+    elif rformat == 'jpg' or rformat == 'jpeg':
+      pic.mime = 'image/jpeg'
+      image.save(buf, 'JPG')
+    else:
+      pic.mime = 'image/unknown'
+    self.logger ("format: %s" % pic.mime)
+    pic.data   = data.data()
+    pic.width  = self.coverArtPixmap.width()
+    pic.height = self.coverArtPixmap.height()
+    pic.depth  = self.coverArtPixmap.depth()
+    pic.colors = image.colorCount ()
+    if len (self.audio.pictures) > 0:
+      ret = QtGui.QMessageBox.warning(self, "FLAC Tagger",
+                                "This FLAC file already contains one or more pictures.\n"
+                                "Do you want to replace them?",
+                                QtGui.QMessageBox.Yes | QtGui.QMessageBox.Cancel,
+                                QtGui.QMessageBox.Cancel)
+      if ret == QtGui.QMessageBox.Yes:
+        self.audio.clear_pictures ()
+        self.audio.addPicture (pic)
+      else:
+        # make sure the old picture is displayed again
+        self.displayPictures ()
+   
   def showHelp (self):
     dialog = help.HelpDialog (self, self.logger)
     dialog.show()
