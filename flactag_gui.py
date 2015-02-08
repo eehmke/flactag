@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'flactag_gui.ui'
 #
-# Created: Thu Jan 29 19:25:16 2015
+# Created: Mon Feb  9 00:11:52 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -162,7 +162,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menu_Help.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -174,9 +174,13 @@ class Ui_MainWindow(object):
         self.channelsLabel.setText(_translate("MainWindow", "Channels", None))
         self.buttonAdd.setToolTip(_translate("MainWindow", "Add new empty tag", None))
         self.buttonAdd.setText(_translate("MainWindow", "Add Tag", None))
-        self.buttonAddHires.setToolTip(_translate("MainWindow", "calculate phc tag based on artist and title, add relevant tags", None))
+        self.buttonAddHires.setToolTip(_translate("MainWindow", "<html><head/><body><p>Calculate phc tag based on artist and title, add relevant tags.</p><p>This will activate the blue LED on the Pono when this song is played.</p><p><br/></p></body></html>", None))
         self.buttonAddHires.setText(_translate("MainWindow", "add HiRes Tags", None))
-        self.buttonDelete.setToolTip(_translate("MainWindow", "delete selected tag", None))
+        self.buttonDelete.setToolTip(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'DejaVu Sans\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Delete selected tag</p></body></html>", None))
         self.buttonDelete.setText(_translate("MainWindow", "Delete Tag", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Tags", None))
         self.buttonAddPicture.setText(_translate("MainWindow", "Add Picture", None))

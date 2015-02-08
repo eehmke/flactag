@@ -48,8 +48,9 @@ from logger import Logger
 # 0.1.4 24.01.2015 bugfix, path of help file when called from other directory
 # 0.1.5 28.01.2015 improved directory display, added cover art display
 # 0.1.6 08.02.2015 corrected jpg problem in windows, added cover art setting
+# 0.1.7 09.02 2015 improved tooltip messages
 
-version = "V0.1.6"
+version = "V0.1.7"
  
 class Traverser:
   def __init__(self, logger):
