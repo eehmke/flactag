@@ -49,8 +49,9 @@ from logger import Logger
 # 0.1.5 28.01.2015 improved directory display, added cover art display
 # 0.1.6 08.02.2015 corrected jpg problem in windows, added cover art setting
 # 0.1.7 09.02 2015 improved tooltip messages
+# 0.1.8 14.02.2015 corrected bug when storing pictures
 
-version = "V0.1.7"
+version = "V0.1.8"
  
 class Traverser:
   def __init__(self, logger):
@@ -609,6 +610,8 @@ class FlacTagWindow (QtGui.QMainWindow, Ui_MainWindow):
       else:
         # make sure the old picture is displayed again
         self.displayPictures ()
+    else:
+      self.audio.addPicture (pic)
    
   def showHelp (self):
     dialog = help.HelpDialog (self, self.logger)
