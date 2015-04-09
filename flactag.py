@@ -50,8 +50,9 @@ from logger import Logger
 # 0.1.6 08.02.2015 corrected jpg problem in windows, added cover art setting
 # 0.1.7 09.02 2015 improved tooltip messages
 # 0.1.8 14.02.2015 corrected bug when storing pictures
+# 0.1.9 10.03.2015 improved exception handling
 
-version = "V0.1.8"
+version = "V0.1.9"
  
 class Traverser:
   def __init__(self, logger):
@@ -106,6 +107,8 @@ class Traverser:
               self.counter += 1
         except FLACNoHeaderError:
           self.logger ('is no flac file')
+        except:
+          self.logger ('unknown flac error: %s' % unicode (sFilePath))
 
   def traverseDirResetPono (self, path):
     self.logger ("traverseDirSetPono: %s" % path)

@@ -45,3 +45,7 @@ you may have to use the source package.
 Extract the flactag-win<version>.zip into a local directory. The dist
 subdirectory may be moved or copied to a location as needed. Run the program
 flactag.exe.
+
+To install the source packages on Windows (32 bit), use these installers:
+https://www.python.org/ftp/python/2.7.9/python-2.7.9.msi
+http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.3/PyQt4-4.11.3-gpl-Py2.7-Qt4.8.6-x32.exe

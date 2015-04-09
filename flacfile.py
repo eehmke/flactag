@@ -50,7 +50,11 @@ class FlacFile (FLAC):
       self.modified = False
       self.logger = logger
     except FLACNoHeaderError:
+      logger ("FLACNoHeaderError %s" % name)
       raise
+    except:
+      logger ("Unknown FLAC Error % s" % name)
+      raise BaseException ("Unknown FLAC Error % s" % name)
     
   def setTag (self ,tag, value):
     self[tag] = value
